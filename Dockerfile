@@ -110,7 +110,7 @@ ENV LANG=C.UTF-8 \
 
 LABEL org.opencontainers.image.title="helium-cdp" \
       org.opencontainers.image.description="Headless Helium with Chrome DevTools Protocol and CJK fonts" \
-      org.opencontainers.image.source="https://github.com/bingyin/helium-cdp" \
+      org.opencontainers.image.source="https://github.com/9bingyin/helium-cdp" \
       org.opencontainers.image.version="${HELIUM_VERSION}"
 
 EXPOSE 9222 9223
