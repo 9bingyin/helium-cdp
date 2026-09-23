@@ -1,0 +1,2 @@
+! 挂到 /etc/helium/ublock/user-filters.txt。# 开头的行会被忽略。
+||example.com^

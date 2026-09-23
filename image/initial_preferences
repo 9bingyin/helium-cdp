@@ -1,0 +1,11 @@
+{
+  "helium": {
+    "completed_onboarding": true,
+    "services": {
+      "enabled": true,
+      "user_consented": true,
+      "ublock_assets": true,
+      "browser_updates": false
+    }
+  }
+}

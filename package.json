@@ -1,0 +1,8 @@
+{
+  "name": "helium-cdp",
+  "private": true,
+  "scripts": {
+    "test:cdp": "bun test/cdp.ts",
+    "test:ublock": "bun test/ublock.ts"
+  }
+}
