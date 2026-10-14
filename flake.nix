@@ -2,7 +2,7 @@
   description = "Headless Helium with Chrome DevTools Protocol";
 
   inputs = {
-    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nur-packages.url = "github:9bingyin/nur-packages";
     flake-parts.url = "github:hercules-ci/flake-parts";
     treefmt-nix = {

@@ -1,5 +1,16 @@
 version: 2
 updates:
+  - package-ecosystem: nix
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    cooldown:
+      default-days: 0
+    groups:
+      nix:
+        patterns:
+          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
