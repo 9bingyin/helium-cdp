@@ -36,9 +36,8 @@ pkgs.dockerTools.streamLayeredImage {
   ];
 
   extraCommands = ''
-    mkdir -p etc tmp
+    mkdir -p tmp
     chmod 1777 tmp
-    printf 'hosts: files dns\npasswd: files\ngroup: files\n' > etc/nsswitch.conf
   '';
 
   config = {
