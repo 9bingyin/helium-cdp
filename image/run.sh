@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Chromium only accepts the DevTools socket on loopback, so socat publishes it.
+# Helium only accepts the DevTools socket on loopback. realm publishes it.
 set -eu
 
 public_port="${HELIUM_PUBLIC_PORT:-9222}"
@@ -47,7 +47,7 @@ if [ -s "$filters_file" ] || [ -n "$lists_source" ]; then
   } >/etc/chromium/policies/managed/ublock.json
 fi
 
-socat TCP4-LISTEN:"${public_port}",fork,reuseaddr,bind=0.0.0.0 TCP4:127.0.0.1:"${debug_port}" &
+realm -l "[::]:${public_port}" -r "127.0.0.1:${debug_port}" &
 mkdir -p /tmp/helium-profile
 
 exec helium \

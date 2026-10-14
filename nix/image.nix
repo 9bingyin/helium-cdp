@@ -1,18 +1,41 @@
 {
   pkgs,
   lib,
-  helium,
+  helium-bin,
 }:
 let
   fontPackages = [
     pkgs.noto-fonts-cjk-sans-static
     pkgs.noto-fonts-cjk-serif-static
   ];
+  helium =
+    pkgs.runCommand "helium-${helium-bin.version}"
+      {
+        nativeBuildInputs = [
+          pkgs.makeBinaryWrapper
+          pkgs.patchelf
+          pkgs.removeReferencesTo
+        ];
+      }
+      ''
+        mkdir -p $out/bin $out/lib
+        cp -a ${helium-bin}/lib/helium $out/lib/helium
+        rm -f $out/lib/helium/libqt6_shim.so
+
+        udevLib=$(patchelf --print-rpath $out/lib/helium/helium | tr : "\n" | grep -- -systemd-)
+        cp -a "$udevLib"/libudev.so* $out/lib/
+        patchelf --set-rpath "$(patchelf --print-rpath $out/lib/helium/helium | sed "s|$udevLib|$out/lib|")" $out/lib/helium/helium
+        remove-references-to -t "$(dirname "$udevLib")" $out/lib/libudev.so*
+
+        makeBinaryWrapper $out/lib/helium/helium $out/bin/helium \
+          --set CHROME_WRAPPER "$out/bin/helium" \
+          --add-flag "--simulate-outdated-no-au=Tue, 31 Dec 2099 23:59:59 GMT"
+      '';
 in
 pkgs.dockerTools.streamLayeredImage {
   name = "helium-cdp";
-  tag = helium.version;
-  maxLayers = 100;
+  tag = helium-bin.version;
+  maxLayers = 20;
 
   contents = [
     helium
@@ -23,7 +46,7 @@ pkgs.dockerTools.streamLayeredImage {
   ++ [
     pkgs.bashNonInteractive
     pkgs.coreutils
-    pkgs.socat
+    pkgs.realm
     pkgs.tini
   ];
 
@@ -64,13 +87,13 @@ pkgs.dockerTools.streamLayeredImage {
         }
       }"
       "HELIUM_DEFAULT_LISTS=${../image/ublock/filter-lists.txt}"
-      "HELIUM_VERSION=${helium.version}"
+      "HELIUM_VERSION=${helium-bin.version}"
       "PATH=${
         lib.makeBinPath [
           helium
           pkgs.coreutils
           pkgs.bashNonInteractive
-          pkgs.socat
+          pkgs.realm
         ]
       }"
     ];
@@ -79,12 +102,12 @@ pkgs.dockerTools.streamLayeredImage {
       "org.opencontainers.image.description" =
         "Headless Helium with Chrome DevTools Protocol and CJK fonts";
       "org.opencontainers.image.source" = "https://github.com/9bingyin/helium-cdp";
-      "org.opencontainers.image.version" = helium.version;
+      "org.opencontainers.image.version" = helium-bin.version;
     };
   };
 
   passthru = {
-    heliumVersion = helium.version;
+    heliumVersion = helium-bin.version;
   };
 
   meta = {

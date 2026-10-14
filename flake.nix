@@ -29,7 +29,7 @@
         {
           packages.image = pkgs.callPackage ./nix/image.nix {
             inherit pkgs;
-            helium = inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system}.helium-bin;
+            helium-bin = inputs.nur-packages.packages.${pkgs.stdenv.hostPlatform.system}.helium-bin;
           };
           packages.default = config.packages.image;
 
