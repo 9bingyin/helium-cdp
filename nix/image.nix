@@ -9,25 +9,10 @@ let
     pkgs.noto-fonts-cjk-serif-static
   ];
   helium =
-    pkgs.runCommand "helium-${helium-bin.version}"
-      {
-        nativeBuildInputs = [
-          pkgs.makeBinaryWrapper
-          pkgs.patchelf
-          pkgs.removeReferencesTo
-        ];
-      }
+    pkgs.runCommand "helium-${helium-bin.version}" { nativeBuildInputs = [ pkgs.makeBinaryWrapper ]; }
       ''
-        mkdir -p $out/bin $out/lib
-        cp -a ${helium-bin}/lib/helium $out/lib/helium
-        rm -f $out/lib/helium/libqt6_shim.so
-
-        udevLib=$(patchelf --print-rpath $out/lib/helium/helium | tr : "\n" | grep -- -systemd-)
-        cp -a "$udevLib"/libudev.so* $out/lib/
-        patchelf --set-rpath "$(patchelf --print-rpath $out/lib/helium/helium | sed "s|$udevLib|$out/lib|")" $out/lib/helium/helium
-        remove-references-to -t "$(dirname "$udevLib")" $out/lib/libudev.so*
-
-        makeBinaryWrapper $out/lib/helium/helium $out/bin/helium \
+        mkdir -p $out/bin
+        makeBinaryWrapper ${helium-bin.unwrapped}/bin/helium $out/bin/helium \
           --set CHROME_WRAPPER "$out/bin/helium" \
           --add-flag "--simulate-outdated-no-au=Tue, 31 Dec 2099 23:59:59 GMT"
       '';

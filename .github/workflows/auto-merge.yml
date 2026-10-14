@@ -7,9 +7,7 @@ on:
     types:
       - completed
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   merge:
@@ -17,26 +15,29 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Merge Dependabot pull request
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prs = context.payload.workflow_run.pull_requests ?? [];
-            for (const pr of prs) {
-              const { data } = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-              });
-              if (data.user.login !== "dependabot[bot]") continue;
-              if (data.head.repo?.full_name !== `${context.repo.owner}/${context.repo.repo}`) continue;
-              if (data.merged || data.draft) continue;
-              await github.rest.pulls.merge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                merge_method: "squash",
-              });
-            }
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -eu
+          numbers=$(jq -r '.workflow_run.pull_requests // [] | .[].number' "$GITHUB_EVENT_PATH")
+          for number in $numbers; do
+            pr=$(gh api "repos/${REPOSITORY}/pulls/${number}")
+            login=$(jq -r .user.login <<<"$pr")
+            head=$(jq -r .head.sha <<<"$pr")
+            repo=$(jq -r .head.repo.full_name <<<"$pr")
+            merged=$(jq -r .merged <<<"$pr")
+            draft=$(jq -r .draft <<<"$pr")
+            [ "$login" = "dependabot[bot]" ] || continue
+            [ "$repo" = "$REPOSITORY" ] || continue
+            [ "$head" = "$HEAD_SHA" ] || continue
+            [ "$merged" = "false" ] || continue
+            [ "$draft" = "false" ] || continue
+            gh pr merge "$number" --squash --repo "$REPOSITORY"
+          done
