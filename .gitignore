@@ -1,2 +1,4 @@
-test/out/
 *.log
+.sprite
+result
+result-*

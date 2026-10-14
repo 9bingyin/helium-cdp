@@ -129,6 +129,4 @@ const png = await view.screenshot({ encoding: "buffer" });
 if (png.length < 1024 || png[0] !== 0x89 || png[1] !== 0x50) {
   fail(`截图不是有效 PNG（${png.length} 字节）`);
 }
-await Bun.write(new URL("./out/cjk.png", import.meta.url), png);
-console.log(`截图已写入 test/out/cjk.png（${png.length} 字节）`);
 console.log("CDP 与 CJK 字体检查通过");
