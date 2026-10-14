@@ -1,9 +1,9 @@
-name: auto-merge
+name: Auto-merge
 
 on:
   workflow_run:
     workflows:
-      - image
+      - Image
     types:
       - completed
 
@@ -19,7 +19,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - name: Merge Dependabot pull request
+      - name: Merge
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
