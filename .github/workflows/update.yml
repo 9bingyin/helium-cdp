@@ -37,7 +37,7 @@ jobs:
 
       - name: Lock upload
         if: steps.update.outputs.changed == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: flake-lock
           path: flake.lock
@@ -65,7 +65,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: flake-lock
           path: ${{ runner.temp }}/lock
@@ -113,7 +113,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: flake-lock
           path: ${{ runner.temp }}/lock
