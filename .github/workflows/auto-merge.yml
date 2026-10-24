@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: write
     steps:
       - name: Merge
         env:
@@ -40,4 +41,5 @@ jobs:
             [ "$merged" = "false" ] || continue
             [ "$draft" = "false" ] || continue
             gh pr merge "$number" --squash --repo "$REPOSITORY"
+            gh workflow run image.yml --ref main --repo "$REPOSITORY"
           done
